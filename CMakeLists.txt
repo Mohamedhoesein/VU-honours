@@ -3,4 +3,4 @@ project(custom_ls C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(custom_ls main.c)
+add_executable(custom_ls main.c include/util.h include/struct.h src/util.c)
