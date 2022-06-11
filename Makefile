@@ -18,4 +18,4 @@ memory_sanitizer: all
 sanitizers: address_sanitizer memory_sanitizer
 
 clean:
-	rm -f ./custom_lsa
+	rm -f ./custom_ls
