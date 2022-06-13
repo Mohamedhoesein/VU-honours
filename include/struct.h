@@ -18,6 +18,9 @@ struct access_class_permissions {
 
 struct file_permissions {
     bool directory;
+    bool set_user_id;
+    bool set_group_id;
+    bool sticky_bit;
     struct access_class_permissions user;
     struct access_class_permissions group;
     struct access_class_permissions other;

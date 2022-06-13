@@ -104,6 +104,9 @@ int retrieve_information(char *full_path, char *name, struct file_information *i
         information->group_owner = int_to_string(file_stat.st_gid);
 
     information->permissions.directory = S_ISDIR(file_stat.st_mode);
+    information->permissions.set_user_id = file_stat.st_mode & S_ISUID;
+    information->permissions.set_group_id = file_stat.st_mode & S_ISGID;
+    information->permissions.sticky_bit = file_stat.st_mode & S_ISVTX;
     information->permissions.user.read = file_stat.st_mode & S_IRUSR;
     information->permissions.user.write = file_stat.st_mode & S_IWUSR;
     information->permissions.user.execute = file_stat.st_mode & S_IXUSR;
@@ -175,13 +178,28 @@ void print_individual_file_long(struct file_information *information, struct wid
     print_permission_character(information->permissions.directory, 'd');
     print_permission_character(information->permissions.user.read, 'r');
     print_permission_character(information->permissions.user.write, 'w');
-    print_permission_character(information->permissions.user.execute, 'x');
+    if (information->permissions.set_user_id && information->permissions.user.execute)
+        printf("s");
+    else if (information->permissions.set_user_id)
+        printf("S");
+    else
+        print_permission_character(information->permissions.user.execute, 'x');
     print_permission_character(information->permissions.group.read, 'r');
     print_permission_character(information->permissions.group.write, 'w');
-    print_permission_character(information->permissions.group.execute, 'x');
+    if (information->permissions.set_group_id && information->permissions.group.execute)
+        printf("s");
+    else if (information->permissions.set_group_id)
+        printf("S");
+    else
+        print_permission_character(information->permissions.group.execute, 'x');
     print_permission_character(information->permissions.other.read, 'r');
     print_permission_character(information->permissions.other.write, 'w');
-    print_permission_character(information->permissions.other.execute, 'x');
+    if (information->permissions.sticky_bit && information->permissions.other.execute)
+        printf("t");
+    else if (information->permissions.sticky_bit)
+        printf("T");
+    else
+        print_permission_character(information->permissions.other.execute, 'x');
 
     printf(" %*lu", width.links, information->number_of_links);
     printf(" %*s", width.owner, information->owner);
