@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <time.h>
 
-struct arguments {
+struct Arguments {
     char *target_directory;
     bool long_form;
 };

@@ -211,7 +211,7 @@ void print_individual_file_long(struct file_information *information, struct wid
     printf(" %s\n", information->name);
 }
 
-void print_information_long(struct arguments arguments, struct dirent *entries, int count) {
+void print_information_long(struct Arguments arguments, struct dirent *entries, int count) {
     struct file_information *all_information = calloc(count, sizeof(struct file_information));
     unsigned long largest_link_count = 0;
     long largest_size = LONG_MIN;
@@ -261,7 +261,7 @@ void print_information_long(struct arguments arguments, struct dirent *entries, 
     free(all_information);
 }
 
-void print_files(struct arguments arguments, struct dirent *entries, int count) {
+void print_files(struct Arguments arguments, struct dirent *entries, int count) {
     qsort(entries, count, sizeof(struct dirent), compare);
     if (!arguments.long_form) {
         print_information_short(entries, count);
