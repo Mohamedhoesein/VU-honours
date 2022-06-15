@@ -8,7 +8,7 @@ static char doc[] = "Custom ls implementation, use -i to specify a is_directory.
 static char args_doc[] = "";
 static struct argp_option options[] = {
         {"directory", 'i', "is_directory", 0, "Directory to list" },
-        {"long", 'l', 0, 0, "Don't produce any output" },
+        {"long", 'l', 0, 0, "Produce long output" },
         { 0 }
 };
 
