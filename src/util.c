@@ -1,11 +1,13 @@
+#include <grp.h>
 #include <limits.h>
+#include <linux/limits.h>
 #include <math.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <grp.h>
+#include <unistd.h>
 #include "../include/util.h"
 
 int retrieve_files(char *target_directory, struct dirent **entries, int *count) {
@@ -67,12 +69,14 @@ char *int_to_string(unsigned int value) {
     return result;
 }
 
-int retrieve_information(char *full_path, char *name, struct file_information *information){
+int retrieve_information(char *full_path, char *name, struct FileInformation *information){
     struct stat file_stat;
-    stat(full_path, &file_stat);
+    lstat(full_path, &file_stat);
 
     information->name = calloc(strlen(name) + 1, sizeof(char));
     strcpy(information->name, name);
+    information->full_path = calloc(strlen(full_path) + 1, sizeof(char));
+    strcpy(information->full_path, full_path);
     information->size = file_stat.st_size;
     information->number_of_links = file_stat.st_nlink;
     struct timespec last_modified = file_stat.st_mtim;
@@ -103,7 +107,8 @@ int retrieve_information(char *full_path, char *name, struct file_information *i
     else
         information->group_owner = int_to_string(file_stat.st_gid);
 
-    information->permissions.directory = S_ISDIR(file_stat.st_mode);
+    information->is_directory = S_ISDIR(file_stat.st_mode);
+    information->is_link = S_ISLNK(file_stat.st_mode);
     information->permissions.set_user_id = file_stat.st_mode & S_ISUID;
     information->permissions.set_group_id = file_stat.st_mode & S_ISGID;
     information->permissions.sticky_bit = file_stat.st_mode & S_ISVTX;
@@ -174,8 +179,8 @@ void print_date(time_t seconds_since_epoch) {
     printf(" %2d %02d:%02d", ts->tm_mday, ts->tm_hour, ts->tm_min);
 }
 
-void print_individual_file_long(struct file_information *information, struct width_information width) {
-    print_permission_character(information->permissions.directory, 'd');
+void print_individual_file_long(struct FileInformation *information, struct WidthInformation width) {
+    print_permission_character(information->is_directory, 'd');
     print_permission_character(information->permissions.user.read, 'r');
     print_permission_character(information->permissions.user.write, 'w');
     if (information->permissions.set_user_id && information->permissions.user.execute)
@@ -208,11 +213,21 @@ void print_individual_file_long(struct file_information *information, struct wid
 
     print_date(information->last_modified);
 
-    printf(" %s\n", information->name);
+    printf(" %s", information->name);
+
+    if (!information->is_link) {
+        printf("\n");
+        return;
+    }
+
+    char *canonical_name = calloc(PATH_MAX, sizeof(char));
+    readlink(information->name, canonical_name, PATH_MAX);
+
+    printf(" -> %s\n", canonical_name);
 }
 
 void print_information_long(struct Arguments arguments, struct dirent *entries, int count) {
-    struct file_information *all_information = calloc(count, sizeof(struct file_information));
+    struct FileInformation *all_information = calloc(count, sizeof(struct FileInformation));
     unsigned long largest_link_count = 0;
     long largest_size = LONG_MIN;
     unsigned int owner_length = 0;
@@ -242,21 +257,21 @@ void print_information_long(struct Arguments arguments, struct dirent *entries, 
     unsigned int number_of_digits_link = (unsigned int)floorl(log10l(largest_link_count)) + 1;
     unsigned int number_of_digits_size = (unsigned int)floorl(log10l(largest_size)) + 1;
 
-    struct width_information width = {
+    struct WidthInformation width = {
         .links = number_of_digits_link,
         .size = number_of_digits_size,
         .owner = owner_length,
         .group_owner = group_length
     };
 
-    for (int i = 0; i < count; ++i) {
+    for (int i = 0; i < count; ++i)
         print_individual_file_long(&all_information[i], width);
-    }
 
     for (int i = 0; i < count; ++i) {
         free(all_information[i].group_owner);
         free(all_information[i].owner);
         free(all_information[i].name);
+        free(all_information[i].full_path);
     }
     free(all_information);
 }

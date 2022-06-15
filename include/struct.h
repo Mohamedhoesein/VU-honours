@@ -10,33 +10,35 @@ struct Arguments {
     bool long_form;
 };
 
-struct access_class_permissions {
+struct AccessClassPermissions {
     bool read;
     bool write;
     bool execute;
 };
 
-struct file_permissions {
-    bool directory;
+struct FilePermissions {
     bool set_user_id;
     bool set_group_id;
     bool sticky_bit;
-    struct access_class_permissions user;
-    struct access_class_permissions group;
-    struct access_class_permissions other;
+    struct AccessClassPermissions user;
+    struct AccessClassPermissions group;
+    struct AccessClassPermissions other;
 };
 
-struct file_information {
+struct FileInformation {
+    bool is_directory;
+    bool is_link;
+    char *full_path;
     char *name;
     long size;
     time_t last_modified;
     unsigned long number_of_links;
     char *owner;
     char *group_owner;
-    struct file_permissions permissions;
+    struct FilePermissions permissions;
 };
 
-struct width_information {
+struct WidthInformation {
     unsigned int links;
     unsigned int size;
     unsigned int owner;

@@ -4,10 +4,10 @@
 #include "include/struct.h"
 #include "include/util.h"
 
-static char doc[] = "Custom ls implementation, use -i to specify a directory.\n-l is only supported.\n";
+static char doc[] = "Custom ls implementation, use -i to specify a is_directory.\n-l is only supported.\n";
 static char args_doc[] = "";
 static struct argp_option options[] = {
-        {"directory", 'i', "directory", 0, "Directory to list" },
+        {"directory", 'i', "is_directory", 0, "Directory to list" },
         {"long", 'l', 0, 0, "Don't produce any output" },
         { 0 }
 };
@@ -57,6 +57,7 @@ int main(int argc, char *argv[]) {
 
     if (default_path)
         free(arguments.target_directory);
+
     free(entries);
 
     return 0;
