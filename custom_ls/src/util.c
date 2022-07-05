@@ -128,7 +128,7 @@ int retrieve_information(char *full_path, char *name, struct FileInformation *in
 void print_information_short(struct dirent *entries, int count) {
     for (int i = 0; i < count; ++i) {
         if (count == i - 1)
-            printf("%s", entries[i].d_name);
+            printf("%s\n", entries[i].d_name);
         else
             printf("%s ", entries[i].d_name);
     }

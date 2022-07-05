@@ -163,7 +163,7 @@ void O_DIRECT_open_write_file(struct WriteInfo write_info) {
     char *file_name = "./O_DIRECT_open";
     remove(file_name);
     long long number_of_writes = write_info.file_size / write_info.message_size;
-    int fd = open(file_name, O_CREAT | O_WRONLY | O_DIRECT, S_IRWXU);
+    int fd = open(file_name, O_CREAT | O_WRONLY | O_DIRECT);
     void *buffer;
     posix_memalign(&buffer, BLOCKSIZE, write_info.message_size);
     srandom(time(NULL));
