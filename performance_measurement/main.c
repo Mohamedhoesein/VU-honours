@@ -22,27 +22,22 @@ int main() {
 void test_writes(struct TimeInfo **times, int *size) {
     struct WriteTestInfo test_info = {
         .time_size = size,
-        .name = NULL,
         .times = times,
         .file_size = BYTES_IN_GB,
-        .message_size = MESSAGE_SIZE,
-        .write_type = fopen_write
+        .message_size = MESSAGE_SIZE
     };
-    place_name(&test_info, "fopen");
+    test_info.write_test = calloc(sizeof(struct WriteTest), 3);
+    test_info.write_test[0].name = "fopen";
+    test_info.write_test[0].write_type = fopen_write;
+    test_info.write_test[1].name = "open";
+    test_info.write_test[1].write_type = open_write;
+    test_info.write_test[2].name = "O_DIRECT_open";
+    test_info.write_test[2].write_type = O_DIRECT_write;
+    test_info.write_test_size = 3;
     write_file(test_info);
-    place_name(&test_info, "open");
-    test_info.write_type = open_write;
-    write_file(test_info);
-    place_name(&test_info, "O_DIRECT_open");
-    test_info.write_type = O_DIRECT_write;
-    write_file(test_info);
-}
-
-void place_name(struct WriteTestInfo *test_info, char *name) {
-    if (test_info->name != NULL)
-        free(test_info->name);
-    test_info->name = calloc(strlen(name) + 1, sizeof(char));
-    strcpy(test_info->name, name);
+    remove("fopen");
+    remove("open");
+    remove("O_DIRECT_open");
 }
 
 void print_time(struct TimeInfo time_info) {

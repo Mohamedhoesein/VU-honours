@@ -7,16 +7,22 @@ enum WriteType {
     O_DIRECT_write
 };
 
-struct WriteTestInfo {
-    int *time_size;
-    struct TimeInfo **times;
+struct WriteTest {
     char *name;
-    int file_size;
-    int message_size;
     enum WriteType write_type;
 };
 
+struct WriteTestInfo {
+    int *time_size;
+    struct TimeInfo **times;
+    int file_size;
+    int message_size;
+    int write_test_size;
+    struct WriteTest *write_test;
+};
+
 struct WriteInfo {
+    char *name;
     struct timespec *start_time;
     struct timespec *end_time;
     int file_size;
