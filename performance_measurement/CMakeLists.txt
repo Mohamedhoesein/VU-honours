@@ -3,4 +3,4 @@ project(performance_measurement C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(performance_measurement main.c)
+add_executable(performance_measurement main.c src/write.c)
